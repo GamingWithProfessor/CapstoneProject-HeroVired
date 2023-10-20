@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Ground
+  - Obstacle
+  - Goal
+  - Hotel
   layers:
   - Default
   - TransparentFX

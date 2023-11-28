@@ -4,16 +4,13 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Ground
-  - Obstacle
-  - Goal
-  - Hotel
-  - NPC
+  - SpeedUp
+  - PowerUp
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Ground
+  - 
   - Water
   - UI
   - 

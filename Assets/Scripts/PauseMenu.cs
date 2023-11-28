@@ -1,46 +1,55 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour
 {
-    public GameObject pauseMenuUI;
-    public bool isGamePaused = false;
+    public GameObject pauseMenuPanel;
+    public GameObject settingsPanel;
 
-    void Start()
+    public void CloseSettings()
     {
-        pauseMenuUI.SetActive(false);
+        settingsPanel.SetActive(false);
+        pauseMenuPanel.SetActive(true);
     }
 
-    void Update()
+    private void Update()
     {
-        // If the player presses the escape key, pause or resume the game
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            isGamePaused = !isGamePaused;
-        }
-
-        // If the game is paused, enable the pause menu UI
-        if (isGamePaused)
-        {
-            pauseMenuUI.SetActive(true);
-            Time.timeScale = 0f;
-        }
-        else
-        {
-            pauseMenuUI.SetActive(false);
-            Time.timeScale = 1f;
+            if (Time.timeScale == 0)
+            {
+                ResumeGame();
+            }
+            else
+            {
+                PauseGame();
+            }
         }
     }
 
-    // Public method to resume the game
     public void ResumeGame()
     {
-        isGamePaused = false;
+        pauseMenuPanel.SetActive(false);
+        Time.timeScale = 1;
     }
 
-    // Public method to quit the game
-    public void QuitGame()
+    public void PauseGame()
     {
-        Application.Quit();
+        pauseMenuPanel.SetActive(true);
+        Time.timeScale = 0;
+    }
+
+    public void LoadMainMenu()
+    {
+        Time.timeScale = 1;
+        SceneManager.LoadScene("MainMenu");
+    }
+
+    public void LoadSettings()
+    {
+        pauseMenuPanel.SetActive(false);
+        settingsPanel.SetActive(true);
     }
 }

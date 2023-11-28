@@ -1,53 +1,75 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    public float timeLimit; // The maximum time allowed to reach the goal.
-    public TextMeshProUGUI timerText; // The UI text to display the timer.
-    private float startTime; // The time when the timer started.
-    private bool isRunning; // Whether the timer is running.
-    void Start()
+    private CountdownTimer countdownTimer;
+
+    // Singleton pattern
+    private static GameManager _instance;
+    public static GameManager Instance { get { return _instance; } }
+
+    public int deliveriesCompleted = 0;
+    public int deliveriesRequiredForNextLevel = 1;
+
+    void Awake()
     {
-        // Initialize the timer.
-        startTime = Time.time;
-        isRunning = false;
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+            DontDestroyOnLoad(this.gameObject);
+        }
+
+        // Initialize references
+        countdownTimer = GetComponentInChildren<CountdownTimer>();
     }
 
     void Update()
     {
-        // If the timer is running, update the timer text.
-        if (isRunning)
+        if (deliveriesCompleted >= deliveriesRequiredForNextLevel)
         {
-            float elapsedTime = Time.time - startTime;
-            timerText.text = $"{timeLimit - elapsedTime:0.0}";
+            LoadNextLevel();
         }
+    }
 
-        // Check if the player has reached the goal or run out of time.
-        if (GameObject.FindWithTag("Goal") != null)
+    public void DeliveryCompleted()
+    {
+        deliveriesCompleted++;
+    }
+
+    public void DeliveryFailed()
+    {
+        // Implement any actions for a failed delivery
+    }
+
+    void LoadNextLevel()
+    {
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        int nextSceneIndex = currentSceneIndex + 1;
+
+        if (nextSceneIndex < SceneManager.sceneCountInBuildSettings)
         {
-            // The player has reached the goal. Stop the timer and display a success message.
-            isRunning = false;
-            timerText.text = "Deliver Successful!";
+            SceneManager.LoadScene(nextSceneIndex);
         }
-        else if (Time.time - startTime > timeLimit)
+        else
         {
-            // The player has run out of time. Stop the timer and display a failure message.
-            isRunning = false;
-            timerText.text = "Deliver Failed!";
+            Debug.LogWarning("No more levels available.");
+            // Optionally, implement game completion logic here
         }
     }
-    public void StartTimer()
+
+    public void DeliverySuccessful()
     {
-        // Start the timer.
-        startTime = Time.time;
-        isRunning = true;
+        DeliveryCompleted();
+        // Implement any actions for a successful delivery
     }
-    public void StopTimer()
+
+    public void AddExtraTime(float extraTime)
     {
-        // Stop the timer.
-        isRunning = false;
+        countdownTimer.AddExtraTime(extraTime);
     }
 }

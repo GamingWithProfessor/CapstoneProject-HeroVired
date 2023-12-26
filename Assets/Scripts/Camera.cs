@@ -8,7 +8,7 @@ public class CameraController : MonoBehaviour
     public float rotationSpeed = 5f;
     public float fovIncreaseSpeed = 5f; // Adjust the speed of FOV change
 
-    void Start()
+    private void Start()
     {
         if (playerTransform != null)
         {
@@ -23,7 +23,7 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    void LateUpdate()
+    private void LateUpdate()
     {
         if (playerTransform != null)
         {
@@ -34,8 +34,9 @@ public class CameraController : MonoBehaviour
             // Calculate the desired position based on the rotated offset
             Vector3 desiredPosition = playerTransform.position - (rotation * Vector3.forward * distance) + new Vector3(0f, height, 0f);
 
-            // Smoothly move the camera to the desired position
+            // Update the camera's position and rotation smoothly
             transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * rotationSpeed);
+            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * rotationSpeed);
 
             // Look at the player
             transform.LookAt(playerTransform.position);

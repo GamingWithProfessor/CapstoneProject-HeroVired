@@ -1,52 +1,56 @@
 using UnityEngine;
 
-public enum PowerUpType
+public class Powerup : MonoBehaviour
 {
-    SpeedBoost,
-    ExtraTimer
-}
+    public enum PowerupType
+    {
+        Timer,        // Timer power-up
+        SpeedBoost    // Speed boost power-up
+    }
 
-public class PowerUp : MonoBehaviour
-{
-    public PowerUpType type;
-    public float duration = 5f;
+    public PowerupType powerupType; // Type of the power-up
+    public float timeToAdd = 10f;   // The amount of time to add to the timer (for Timer power-up)
+    public float speedBoostDuration = 5f; // Duration of the speed boost (for Speed Boost power-up)
+    public float speedBoostMultiplier = 2f; // Multiplier for speed boost (for Speed Boost power-up)
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            ApplyPowerUpEffect(other.gameObject);
+            // Apply the power-up effect based on its type
+            switch (powerupType)
+            {
+                case PowerupType.Timer:
+                    ApplyTimerPowerup(other);
+                    break;
+                case PowerupType.SpeedBoost:
+                    ApplySpeedBoostPowerup(other);
+                    break;
+                // Add more cases for additional power-up types if needed
+            }
+
+            // Destroy the power-up object
             Destroy(gameObject);
         }
     }
 
-    private void ApplyPowerUpEffect(GameObject player)
+    private void ApplyTimerPowerup(Collider playerCollider)
     {
-        MyPlayerController playerController = player.GetComponent<MyPlayerController>();
-        CountdownTimer countdownTimer = FindObjectOfType<CountdownTimer>();
-
-        if (playerController != null)
+        // Apply the timer power-up effect to the player's timer
+        TimerController timerController = playerCollider.GetComponent<TimerController>();
+        if (timerController != null)
         {
-            switch (type)
-            {
-                case PowerUpType.SpeedBoost:
-                    playerController.ApplySpeedBoost();
-                    break;
-                case PowerUpType.ExtraTimer:
-                    if (countdownTimer != null)
-                    {
-                        countdownTimer.AddExtraTime(10f); // You can adjust the added time as needed
-                    }
-                    break;
-            }
+            timerController.AddTime(timeToAdd);
         }
-
-        Invoke(nameof(RevertPowerUpEffect), duration);
     }
 
-    private void RevertPowerUpEffect()
+    private void ApplySpeedBoostPowerup(Collider playerCollider)
     {
-        // Implement code to revert the power-up effect if needed
-        Destroy(gameObject);
+        // Apply the speed boost power-up effect to the player
+        PlayerController playerController = playerCollider.GetComponent<PlayerController>();
+        if (playerController != null)
+        {
+            playerController.ActivateSpeedBoost(speedBoostMultiplier, speedBoostDuration);
+        }
     }
 }
